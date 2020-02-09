@@ -132,6 +132,8 @@ class Skeleton:
     return '-'.join(getupperlower(self.name,upper))
   def getNamespace(self,upper):
     return '\\'.join(getupperlower(self.name,upper))
+  def getNamespace2(self,upper):
+    return '\\\\'.join(getupperlower(self.name,upper))
   def getRouteName(self,upper):
     return '/'.join(getupperlower(self.name,upper))
   def getTableName(self,upper):
@@ -150,6 +152,8 @@ class Skeleton:
     [self.getTableName(False),self.module.getTableName(False)],
     [self.getNamespace(True),self.module.getNamespace(True)],
     [self.getNamespace(False),self.module.getNamespace(False)],
+    [self.getNamespace2(True),self.module.getNamespace2(True)],
+    [self.getNamespace2(False),self.module.getNamespace2(False)],
     [self.getRouteName(True),self.module.getRouteName(True)],
     [self.getRouteName(False),self.module.getRouteName(False)],
     [self.getFormName(True),self.module.getFormName(True)],
@@ -169,7 +173,6 @@ oSkeleton = Skeleton(sSkeletonName)
 oModule = Skeleton(sModuleName)
 oSkeleton.set(oModule)
 print(oSkeleton.get())
-
 # check if path is occupied
 if os.path.exists(sys.argv[1]):
   if args.replace:
@@ -237,7 +240,6 @@ while not bFinish:
       sSource = dir
       for result in oSkeleton.get():
         if result[0] in dir and result[0] != result[1]:
-          print(result[0] + " - " + result[1])
           # rename all Folders from skeleton to moduleName
           sDest = dir.replace(result[0],result[1])
           v_print(" - rename folder  " + os.path.join(root,sSource) + " to " + os.path.join(root,sDest))
