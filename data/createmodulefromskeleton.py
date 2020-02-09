@@ -48,6 +48,7 @@ sSkeletonVersion = "1.0.0"
 sModulePhp = "Module.php"
 sComposerJson = "composer.json"
 sModuleConfig = "module.config.php"
+sInstallSql = "install.sql"
 
 #regex validator
 def regex_version_validate(arg_value, pat=re.compile(r'(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)')):
@@ -144,6 +145,8 @@ class Skeleton:
     return ''.join(getupperlower(self.name,upper))
   def getBaseName(self,upper):
     return ''.join(getupperlower(self.name[0],upper))
+  def getLabel(self,upper):
+    return ' '.join(getupperlower(self.name,upper))
   def get(self):
     return [
     [self.getName(True),self.module.getName(True)],
@@ -172,7 +175,8 @@ class Skeleton:
 oSkeleton = Skeleton(sSkeletonName)
 oModule = Skeleton(sModuleName)
 oSkeleton.set(oModule)
-print(oSkeleton.get())
+
+
 # check if path is occupied
 if os.path.exists(sys.argv[1]):
   if args.replace:
@@ -306,6 +310,10 @@ for root, dirs, files in os.walk(sModulePath):
     sVersionTag ="@version"
     sSinceTag ="@since"
     sComposerVersion ='"version"'
+    sSkeletonIdfs = "skeleton_idfs"
+    sSkeletonForm = "skeleton-single"
+    sSkeletonSkeletonForm = "skeletonskeleton-single"
+    sSkeletonFormLabel = "Skeleton Skeleton"
 
     sCodeModelStart = "getServiceConfig"
     sCodeControllerStart = "getControllerConfig"
@@ -359,7 +367,19 @@ for root, dirs, files in os.walk(sModulePath):
           v_print(" - set " + sComposerVersion + " to " + sModuleVersion + " in " + sSource + " at Line " + str(line_count))
           line ="  " + sComposerVersion + ': "' + sModuleVersion + '",\n'
 
-
+        # install.sql custom keys
+        if sSource.find(sInstallSql) > 0 and line.find(sSkeletonSkeletonForm) > 0:
+          v_print(" - renaming " + sSource + " at Line: " + str(line_count))
+          line = line.replace(sSkeletonSkeletonForm, oModule.getFormName(False)+"-single")
+        if sSource.find(sInstallSql) > 0 and line.find(sSkeletonForm) > 0:
+          v_print(" - renaming " + sSource + " at Line: " + str(line_count))
+          line = line.replace(sSkeletonForm, oModule.getBaseName(False)+"-single")
+        if sSource.find(sInstallSql) > 0 and line.find(sSkeletonIdfs) > 0:
+          v_print(" - renaming " + sSource + " at Line: " + str(line_count))
+          line = line.replace(sSkeletonIdfs, oModule.getBaseName(False)+"_idfs")
+        if sSource.find(sInstallSql) > 0 and line.find(sSkeletonFormLabel) > 0:
+          v_print(" - renaming " + sSource + " at Line: " + str(line_count))
+          line = line.replace(sSkeletonFormLabel, oModule.getLabel(True))
 
         # replace skeleton name
         sOrig=line
