@@ -1,0 +1,15 @@
+docs_dir: docs/book
+site_dir: docs/html
+nav:
+  - Home: index.md
+  - Introduction: intro.md
+  - 'Quick Start': quick-start.md
+  - 'Dynamic Fields': dynamic-fields.md
+  - Tutorials:
+    - 'Create Module': create-module.md
+site_name: oneplace-skeleton-skeleton
+site_description: "onePlace Application Skeleton Module"
+repo_url: 'https://github.com/OnePlc/PLC_X_Skeleton_Skeleton'
+theme: bootstrap4
+extra:
+  project: onePlc

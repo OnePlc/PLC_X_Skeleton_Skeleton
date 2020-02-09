@@ -1,0 +1,49 @@
+<?php
+/**
+ * module.config.php - Skeleton Config
+ *
+ * Main Config File for Skeleton Skeleton Plugin
+ *
+ * @category Config
+ * @package Skeleton\Skeleton
+ * @author Verein onePlace
+ * @copyright (C) 2020  Verein onePlace <admin@1plc.ch>
+ * @license https://opensource.org/licenses/BSD-3-Clause
+ * @version 1.0.0
+ * @since 1.0.0
+ */
+
+namespace OnePlace\Skeleton\Skeleton;
+
+use Laminas\Router\Http\Literal;
+use Laminas\Router\Http\Segment;
+use Laminas\ServiceManager\Factory\InvokableFactory;
+
+return [
+    # Skeleton Module - Routes
+    'router' => [
+        'routes' => [
+            'skeleton-skeleton' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route' => '/skeleton/skeleton[/:action[/:id]]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id'     => '[0-9]+',
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\SkeletonController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+        ],
+    ], # Routes
+
+    # View Settings
+    'view_manager' => [
+        'template_path_stack' => [
+            'skeleton-skeleton' => __DIR__ . '/../view',
+        ],
+    ],
+];
