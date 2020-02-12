@@ -2,7 +2,7 @@
   "name": "oneplace/oneplace-skeleton-skeleton",
   "description": "onePlace Skeleton-Skeleton Plugin. Manage your Skeleton's",
   "type": "oneplace-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "BSD-3-Clause",
   "keywords": [
     "laminas",

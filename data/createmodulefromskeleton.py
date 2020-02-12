@@ -18,111 +18,9 @@ createmodulefromskeleton.py - Create your own submodule form a oneplace Skeleton
  @author Verein onePlace
  @copyright (C) 2020  Verein onePlace <admin@1plc.ch>
  @license https://opensource.org/licenses/BSD-3-Clause
- @version 1.0.0
+ @version 1.0.1
  @since 1.0.0
 """
-
-
-
-# Remove Files and Folders (wildcard only for files)
-aToDelFiles = []
-aToDelFiles.append("/data/*.sh")
-aToDelFiles.append("/data/*.ps1")
-aToDelFiles.append("/data/*.py")
-aToDelFiles.append("/view/layout/*default.phtml")
-aToDelFiles.append("/CHANGELOG.md")
-aToDelFiles.append("/mkdocs.yml")
-
-aToDelDirs = []
-aToDelDirs.append("/.git")
-aToDelDirs.append("/.idea")
-aToDelDirs.append("/docs/book")
-
-# Whitelist from renaming
-aWhiteList = []
-aWhiteList.append("/language/")
-
-#default Values
-sSkeletonName = "Skeleton-Skeleton"
-sSkeletonVersion = "1.0.0"
-sModulePhp = "Module.php"
-sComposerJson = "composer.json"
-sModuleConfig = "module.config.php"
-sInstallSql = "install.sql"
-
-#regex validator
-def regex_version_validate(arg_value, pat=re.compile(r'(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)')):
-    if not pat.match(arg_value):
-        raise argparse.ArgumentTypeError
-    return arg_value
-def regex_skeleton_module(arg_value, pat=re.compile(r'((([\w]+))-){1}')):
-    if not pat.match(arg_value):
-        raise argparse.ArgumentTypeError
-    return arg_value
-
-oArgParser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter,
-                                     description='Create a new Submodule based on the current PLC_X_Skeleton_Skeleton',
-                                     epilog='Run it directly inside /data/ !\n\n'
-                                            'Example:\n'
-                                            + sys.argv[0] + ': ../../PLC_X_Modul modul-submodule -mvp\n'
-                                            + sys.argv[0] + ': ../../PLC_X_Modul modul-submodule --parent contact-history --version 1.0.1 -mvp\n')
-oArgParser.add_argument("path", help='path to your new submodule')
-oArgParser.add_argument("submodule", help='your submodule: skeleton-skeleton',default=sSkeletonName,type=regex_skeleton_module)
-oArgParser.add_argument("--version", help='X.X.X - version of submodule',default=sSkeletonVersion,type=regex_version_validate)
-oArgParser.add_argument("--parent", help=sSkeletonName+' - skeleton name',default=sSkeletonName,type=regex_skeleton_module)
-
-oArgParser.add_argument("-v", "--verbose", help='increase output verbosity',action="store_true")
-oArgParser.add_argument("-m", "--model", help='add model structure',action="store_true")
-oArgParser.add_argument("-c", "--controller", help='add controller structure',action="store_true")
-oArgParser.add_argument("-p", "--partial", help='add partial structure',action="store_true")
-oArgParser.add_argument("-r", "--replace", help='replace destination',action="store_true")
-args = oArgParser.parse_args()
-
-sModuleVersion = args.version
-sSkeletonName = args.parent
-sSkeletonVersion = args.version
-sModuleName = args.submodule
-sModulePath = os.path.abspath(args.path)
-sScriptPath = os.path.realpath(__file__)
-
-DEBUG = True if args.verbose else False
-if not args.model:
-  aToDelDirs.append("/src/Model")
-if not args.controller:
-  aToDelDirs.append("/src/Controller")
-if not args.partial:
-  aToDelDirs.append("/view/partial")
-
-"""
-  Helper Functions and Class
-"""
-def v_print(value):
-  if DEBUG :
-    print(value)
-
-def remove_readonly(func, path, exc_info):
-    import stat
-    if not os.access(path, os.W_OK):
-        # Is the error an access error ?
-        os.chmod(path, stat.S_IWUSR)
-        func(path)
-    else:
-        raise
-
-# Convert Module Name for Skeleton to skeleton or vs
-def getupperlower(name, upper = True):
-  aModule=[]
-
-  if not isinstance(name, list):
-    name = [name]
-  for item in name:
-    if(item[0].islower() and upper):
-      aModule.append(item[0].upper() + item[1:])
-    elif(item[0].isupper() and not upper):
-      aModule.append(item[0].lower()+ item[1:])
-    else:
-      aModule.append(item)
-  return aModule
 
 class Skeleton:
   def __init__(self,name):
@@ -161,20 +59,321 @@ class Skeleton:
     [self.getRouteName(False),self.module.getRouteName(False)],
     [self.getFormName(True),self.module.getFormName(True)],
     [self.getFormName(False),self.module.getFormName(False)],
+    [self.getBaseName(True)+"1",self.module.getBaseName(True)],
+    [self.getBaseName(False)+"1",self.module.getBaseName(False)],
     [self.getModelName(True),self.module.getModelName(True)],
     [self.getModelName(False),self.module.getModelName(False)],
     [self.getBaseName(True),self.module.getBaseName(True)],
-    [self.getBaseName(False),self.module.getBaseName(False)]
+    [self.getBaseName(False),self.module.getBaseName(False)],
     ]
+  def getview(self):
+    return [
+      [self.getModelName(True)+"2",self.module.getModelName(True)],
+      [self.getModelName(False)+"2",self.module.getModelName(False)],
+      [self.getBaseName(True),self.module.getBaseName(True)],
+      [self.getBaseName(False),self.module.getBaseName(False)],
+      ]
+# Remove Files and Folders (wildcard only for files)
+aToDelFiles = []
+aToDelFiles.append("/data/*.sh")
+aToDelFiles.append("/data/*.ps1")
+aToDelFiles.append("/data/*.py")
+aToDelFiles.append("/view/layout/*default.phtml")
+aToDelFiles.append("/CHANGELOG.md")
+aToDelFiles.append("/mkdocs.yml")
+aToDelFiles.append("/README.md")
+
+aToDelDirs = []
+aToDelDirs.append("/.idea")
+aToDelDirs.append("/docs")
+aToDelDirs.append("/.git")
+
+# Whitelist from renaming
+aWhiteList = []
+aWhiteList.append("/language/")
 
 
+#default Values
+sSkeletonName = "Skeleton-Skeleton"
+sSkeletonVersion = "1.0.0"
+sModulePhp = "Module.php"
+sModuleConfig = "module.config.php"
+sModulePhpNC = "Module.php.no_controller"
+sModuleConfigNC = "module.config.php.no_controller"
+sComposerJson = "composer.json"
+sModuleConfig = "module.config.php"
+sInstallSql = "install.sql"
+aHooks = []
+aIncludes = []
+
+aSkeletonControllerNames = []
+aSkeletonControllers = []
+aModuleControllerNames = []
+aModuleControllers = []
+aSkeletonRouteNames = []
+aSkeletonRoutes = []
+aModuleRouteNames = []
+aModuleRoutes = []
+
 """
-  Do the Main Stuff below
+  Helper Functions and Class
 """
+def v_print(value):
+  if DEBUG :
+    print(value)
+
+def remove_readonly(func, path, exc_info):
+    import stat
+    if not os.access(path, os.W_OK):
+        # Is the error an access error ?
+        os.chmod(path, stat.S_IWUSR)
+        func(path)
+    else:
+        raise
+
+# Convert Module Name for Skeleton to skeleton or vs
+def getupperlower(name, upper = True):
+  aModule=[]
+
+  if not isinstance(name, list):
+    name = [name]
+  for item in name:
+    if(item[0].islower() and upper):
+      aModule.append(item[0].upper() + item[1:])
+    elif(item[0].isupper() and not upper):
+      aModule.append(item[0].lower()+ item[1:])
+    else:
+      aModule.append(item)
+  return aModule
+
+#regex validator
+def regex_version_validate(arg_value, pat=re.compile(r'(?:(\d+)\.)?(?:(\d+)\.)?(?:(\d+)\.\d+)')):
+    if not pat.match(arg_value):
+        raise argparse.ArgumentTypeError
+    return arg_value
+def regex_skeleton_module(arg_value, pat=re.compile(r'((([\w]+))-){1}')):
+    if not pat.match(arg_value):
+        raise argparse.ArgumentTypeError
+    return arg_value
+
+oArgParser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter,
+                                     description='Create a new Submodule based on the current PLC_X_Skeleton_Skeleton',
+                                     epilog='Run it directly inside /data/ !\n\n'
+                                            'Example:\n'
+                                            + sys.argv[0] + ': ../../PLC_X_Modul modul-submodule -mvp\n'
+                                            + sys.argv[0] + ': ../../PLC_X_Modul modul-submodule --parent contact-history --version 1.0.1 -mvp\n')
+oArgParser.add_argument("path", help='path to your new submodule')
+oArgParser.add_argument("submodule", help='your submodule: skeleton-skeleton',default=sSkeletonName,type=regex_skeleton_module)
+oArgParser.add_argument("--version", help='X.X.X - version of submodule',default=sSkeletonVersion,type=regex_version_validate)
+oArgParser.add_argument("--parent", help=sSkeletonName+' - skeleton name',default=sSkeletonName,type=regex_skeleton_module)
+oArgParser.add_argument("--upgrade", help='path to project')
+
+oArgParser.add_argument("-v", "--verbose", help='increase output verbosity',action="store_true")
+oArgParser.add_argument("-m", "--model", help='add model structure',action="store_true")
+oArgParser.add_argument("-c", "--controller", help='add controller structure',action="store_true")
+oArgParser.add_argument("-p", "--partial", help='add partial structure',action="store_true")
+oArgParser.add_argument("-r", "--route", help='add route action structure',action="store_true")
+oArgParser.add_argument("-R", "--replace", help='replace destination',action="store_true")
+args = oArgParser.parse_args()
+
+sModuleVersion = args.version
+sSkeletonName = args.parent
+sSkeletonVersion = args.version
+sModuleName = args.submodule
+sModulePath = os.path.abspath(args.path)
+sScriptPath = os.path.realpath(__file__)
+sModuleToUpgrade = args.upgrade
+
+
+DEBUG = True if args.verbose else False
+
+def parseModulePhp(path,names,controllers,hook=False,include=False):
+  sCodeHooks = "CoreEntityController::addHook"
+  sCodeUse = "use "
+  bParseController = False
+  sTempController = ""
+  bParseFactories = False
+
+
+  #parse 'factories'
+  sFactories = "'factories'"
+  sFactoriesEnd = "],"
+  sControllerEnd = "},"
+
+  # save all hooks and includes in Module.php to replace these later
+  try:
+    fp = open(path, "r")
+    for line in fp:
+      # looking for hooks
+      if line.find(sCodeHooks) >= 0 and hook:
+        aHooks.append(line)
+      # looking for use
+      if line.find(sCodeUse) >= 0 and include:
+        aIncludes.append(line)
+
+      if line.find(sFactories) >= 0:
+        bParseFactories = True
+      if bParseFactories and line.find(sFactoriesEnd) >= 0:
+        bParseFactories = False
+      if not bParseFactories:
+        continue
+
+      # parse and save Controllers
+      if bParseController:
+        sTempController = sTempController + line
+        if line.find(sControllerEnd) >= 0:
+          bParseController=False
+          controllers.append(sTempController)
+          sTempController=""
+
+      # detect Start Controller
+      sController = re.search(r'(Controller\\).+(class)', line)
+      if sController:
+        names.append(sController.group(0))
+        bParseController = True
+        sTempController = line
+
+  except IOError:
+    print("Upgrade failed, no oneplace module detected at: " + path + " \n")
+    exit(2)
+
+def parseModuleConfig(path,names,route):
+  bParseRoutes = False
+  sTempRouter = ""
+  bParseRoute = False
+  sRoute = "'routes'"
+  sRoutesEnd = "        ],"
+  sRouteEnd = "            ],"
+  sRouteStart = "["
+
+  try:
+    fp = open(path, "r")
+    for line in fp:
+      #parse 'factories'
+
+      if line.find(sRoute) >= 0:
+        bParseRoutes = True
+        continue
+      if bParseRoutes and line.find(sRoutesEnd) == 0:
+        bParseRoutes = False
+      if not bParseRoutes:
+        continue
+      #print(line)
+      # detect Start Route
+      if not bParseRoute:
+        sRouteName = re.search(r"'(.)+'", line)
+        if sRouteName:
+          names.append(sRouteName.group(0))
+          bParseRoute = True
+          sTempRouter = line
+      else:
+        sTempRouter = sTempRouter + line
+      if bParseRoute and line.find(sRouteEnd) == 0:
+        bParseRoute = False
+        route.append(sTempRouter)
+
+  except IOError as e:
+    print("Upgrade failed, no oneplace module detected at: " + path + " \n" + str(e))
+    exit(2)
+
+
 # init class for handling renaming variants
 oSkeleton = Skeleton(sSkeletonName)
 oModule = Skeleton(sModuleName)
 oSkeleton.set(oModule)
+
+
+'''
+ Upgrade a existing plugin
+'''
+if sModuleToUpgrade:
+
+  parseModulePhp("../src/Module.php",aSkeletonControllerNames,aSkeletonControllers)
+  parseModulePhp(sModuleToUpgrade + "/src/Module.php",aModuleControllerNames,aModuleControllers,True,True)
+
+  # remove known Controllers from List
+  for name in aSkeletonControllerNames:
+    if name.find(oSkeleton.getModelName(True)) >=0:
+      index=aSkeletonControllerNames.index(name)
+      aSkeletonControllerNames.pop(index)
+      aSkeletonControllers.pop(index)
+  for name in aModuleControllerNames:
+    if name.find(oModule.getModelName(True)) >=0:
+      index=aModuleControllerNames.index(name)
+      aModuleControllerNames.pop(index)
+      aModuleControllers.pop(index)
+
+  for sSCtl in aSkeletonControllerNames:
+    for sMCtl in aModuleControllerNames:
+      if sMCtl.find(sSCtl) >= 0:
+        index=aModuleControllerNames.index(sMCtl)
+        aModuleControllerNames.pop(index)
+        aModuleControllers.pop(index)
+
+        index=aSkeletonControllerNames.index(sSCtl)
+        aSkeletonControllerNames.pop(index)
+        aSkeletonControllers.pop(index)
+
+  # aModuleControllers -> Controllers to add after rebase
+  print(str(len(aModuleControllers)) +" new Controllers to add\n")
+
+
+  parseModuleConfig("../config/module.config.php.no_route",aSkeletonRouteNames,aSkeletonRoutes)
+  parseModuleConfig(sModuleToUpgrade+"/config/module.config.php",aModuleRouteNames,aModuleRoutes)
+  # remove known Routes from List
+  for name in aSkeletonRouteNames:
+    if name.find(oSkeleton.getName(False)) >=0:
+      index=aSkeletonRouteNames.index(name)
+      aSkeletonRouteNames.pop(index)
+      aSkeletonRoutes.pop(index)
+  for name in aModuleRouteNames:
+    if name.find(oModule.getName(False)) >=0:
+      index=aModuleRouteNames.index(name)
+      aModuleRouteNames.pop(index)
+      aModuleRoutes.pop(index)
+
+  for sSCtl in aSkeletonRouteNames:
+    for sMCtl in aModuleRouteNames:
+      if sMCtl.find(sSCtl) >= 0:
+        index=aModuleRouteNames.index(sMCtl)
+        aModuleRouteNames.pop(index)
+        aModuleRoutes.pop(index)
+
+        index=aSkeletonRouteNames.index(sSCtl)
+        aSkeletonRouteNames.pop(index)
+        aSkeletonRoutes.pop(index)
+
+
+  # aModuleRoutes -> Routes to add after rebase
+  print(str(len(aModuleRoutes)) +" new Routes to add\n")
+
+  #detect partials
+  if os.path.exists(sModuleToUpgrade+"/view/partial") == True:
+    args.partial = True
+  else:
+    args.partial = False
+
+  #detect partials
+  if os.path.exists(sModuleToUpgrade+"/src/Model/") == True:
+    args.model = True
+  else:
+    args.model = False
+
+  #manage Controller.php
+  args.controller=False
+  args.route=False
+
+
+
+
+if not args.model:
+  aToDelDirs.append("/src/Model")
+
+if not args.controller:
+  aToDelFiles.append("/src/Controller/"+oSkeleton.getModelName(True)+"Controller.php")
+
+if not args.partial:
+  aToDelDirs.append("/view/partial")
 
 
 # check if path is occupied
@@ -189,7 +388,7 @@ if os.path.exists(sys.argv[1]):
 try:
   f = open("../src/Module.php", "r")
   for line in f:
-    if line.find("VERSION") > 0:
+    if line.find("VERSION") >= 0:
       sSkeletonVersion = re.search(r'(?<=VERSION )*[\d.]+', line).group(0)
       #print("Skeleton Version is " + sSkeletonVersion)
 except IOError:
@@ -242,7 +441,7 @@ while not bFinish:
     path = root.split(os.sep)
     for dir in dirs:
       sSource = dir
-      for result in oSkeleton.get():
+      for result in oSkeleton.getview():
         if result[0] in dir and result[0] != result[1]:
           # rename all Folders from skeleton to moduleName
           sDest = dir.replace(result[0],result[1])
@@ -265,8 +464,8 @@ for root, dirs, files in os.walk(sModulePath):
     # ignore whitelisted files
     for url in aWhiteList:
       path = os.path.join(root,sSource)
-      if path.find(url) > 0:
-        print(" - ignore " + path)
+      if path.find(url) >= 0:
+        v_print(" - ignore " + path)
         ignore = True
 
     if ignore:
@@ -284,6 +483,33 @@ for root, dirs, files in os.walk(sModulePath):
 print("Total: " + str(iChangeCount) + " files renamed")
 
 
+# delete copy files before renaming
+if sModuleToUpgrade:
+  try:
+    shutil.rmtree(sModulePath+"/view/partial", ignore_errors=False, onerror=remove_readonly)
+    shutil.copytree(sModuleToUpgrade+"/view/partial", sModulePath+"/view/partial")
+
+    shutil.copyfile(sModuleToUpgrade+"/"+sComposerJson,sModulePath+"/"+sComposerJson)
+    shutil.copyfile(sModuleToUpgrade+"/README.md",sModulePath+"/")
+
+  except IOError as err:
+    v_print("Cant create module "+ "\n" + format(err))
+
+if args.route:
+  os.remove(sModulePath+"/config/module.config.php.no_route")
+else:
+  os.remove(sModulePath+"/config/module.config.php")
+  os.rename(sModulePath+"/config/module.config.php.no_route",sModulePath+"/config/module.config.php")
+  view = "/view/one-place/" + oModule.getBaseName(False) + "/" + oModule.getModelName(False) + "/" + oModule.getModelName(False)
+  shutil.rmtree(sModulePath+view, ignore_errors=False, onerror=remove_readonly)
+
+if args.controller:
+  os.remove(sModulePath+"/src/Module.php.no_controller")
+else:
+  os.remove(sModulePath+"/src/Module.php")
+  os.rename(sModulePath+"/src/Module.php.no_controller",sModulePath+"/src/Module.php")
+
+
 # all renaming inside files happens here:
 iChangeCount=0
 for root, dirs, files in os.walk(sModulePath):
@@ -294,7 +520,7 @@ for root, dirs, files in os.walk(sModulePath):
 
     # ignore whitelisted files
     for url in aWhiteList:
-      if sSource.find(url) > 0:
+      if sSource.find(url) >= 0:
         ignore = True
 
     if ignore:
@@ -318,26 +544,63 @@ for root, dirs, files in os.walk(sModulePath):
     sCodeModelStart = "getServiceConfig"
     sCodeControllerStart = "getControllerConfig"
     sCodeRoutesStart = "Routes"
+    sCodeInsertHooks = "Plugin Hook"
+    sRouteStart = "'routes'"
+    sFactoriesStart = "'routes'"
+    sCodeUse = "use "
     bCodeDelMode = False
 
     try:
       for line in fp:
         line_count=line_count+1
 
+        if sModuleToUpgrade:
+          # module.config.php insert routes
+          if sSource.find(sModuleConfig) >= 0 and line.find(sRouteStart) >= 0:
+            fpW.write(line)
+            for route in aModuleRoutes:
+              fpW.write(route)
+            line=""
+
+          # Module.php insert controllers
+          if sSource.find(sModuleConfig) >= 0 and line.find(sFactoriesStart) >= 0:
+            fpW.write(line)
+            for ctrl in aModuleControllers:
+              fpW.write(ctrl)
+            line=""
+
+
+          # insert Custom Hooks
+          if sSource.find(sModulePhp) >= 0 and line.find(sCodeInsertHooks) >= 0:
+            fpW.write(line)
+            for hook in aHooks:
+              fpW.write(hook)
+
+          # replace aIncludes with original
+          if sSource.find(sModulePhp) >= 0 and line.find(sCodeUse) >= 0:
+            if len(aIncludes) > 0 :
+              for include in aIncludes:
+                fpW.write(include)
+              aIncludes=[]
+              line=""
+            else:
+              continue
+
         # Model Handling
         if not args.model:
-          if sSource.find(sModulePhp) > 0 and line.find(sCodeModelStart) > 0:
+          if sSource.find(sModulePhp) >= 0 and line.find(sCodeModelStart) >= 0:
             v_print(" - del " + sCodeModelStart + " in " + sSource + " at Line " + str(line_count))
             bCodeDelMode = False if bCodeDelMode else True
             line = ""
 
+
         # Controller Handling
-        if not args.controller:
-          if sSource.find(sModulePhp) > 0 and line.find(sCodeControllerStart) > 0:
+        if not args.controller and not sModuleToUpgrade: #deactivated
+          if sSource.find(sModulePhp) >= 0 and line.find(sCodeControllerStart) >= 0:
             v_print(" - del " + sCodeControllerStart + " in " + sSource + " at Line " + str(line_count))
             bCodeDelMode = False if bCodeDelMode else True
             line = ""
-          if sSource.find(sModuleConfig) > 0 and line.find(sCodeRoutesStart) > 0:
+          if sSource.find(sModuleConfig) >= 0 and line.find(sCodeRoutesStart) >= 0:
             v_print(" - del " + sCodeRoutesStart + " in " + sSource + " at Line " + str(line_count))
             bCodeDelMode = False if bCodeDelMode else True
             line = ""
@@ -346,38 +609,39 @@ for root, dirs, files in os.walk(sModulePath):
           line = ""
 
         # not a beauty - but works
-        if sSource.find(sModulePhp) > 0 and line.find("VERSION") > 0:
-          v_print(" - set " + sVersionTag + " to " + sModuleVersion + " in " + sSource + " at Line " + str(line_count))
+        if sSource.find(sModulePhp) >= 0 and line.find("VERSION") >= 0:
+          v_print(" - set " + "VERSION" + " to " + sModuleVersion + " in " + sSource + " at Line " + str(line_count))
           line="    const VERSION = '" + sModuleVersion + "';\n"
 
         # set all versions tags to current verion
-        elif sSource.find(sModulePhp) > 0 and line.find(sVersionTag) > 0:
-          v_print(" - set " + sVersionTag + " to " + sModuleVersion + " in " + sSource + " at Line " + str(line_count))
-          line = line[:line.find(sVersionTag) + len(sVersionTag)] + " " + sModuleVersion + "\n"
+        #elif sSource.find(sModulePhp) >= 0 and line.find(sVersionTag) >= 0:
+        #  v_print(" - set " + sVersionTag + " to " + sModuleVersion + " in " + sSource + " at Line " + str(line_count))
+        #  line = line[:line.find(sVersionTag) + len(sVersionTag)] + " " + sModuleVersion + "\n"
+        #  line = line[:line.find(sVersionTag) + len(sVersionTag)] + " " + sModuleVersion + "\n"
 
         # correct all since tags
-        elif line.find(sSinceTag) > 0:
+        elif line.find(sSinceTag) >= 0:
           sSinceVersion = re.search(r'[\d.]+', line).group(0)
           if pkg_resources.parse_version(sSinceVersion) > pkg_resources.parse_version(sModuleVersion) :
             v_print(" - set " + sSinceTag + " to " + sModuleVersion + " in " + sSource + " at Line " + str(line_count))
             line = line[:line.find(sSinceTag) + len(sSinceTag)] + " " + sModuleVersion + "\n"
 
         #corret composer config file version
-        elif sSource.find(sComposerJson) > 0 and line.find(sComposerVersion) > 0:
+        elif sSource.find(sComposerJson) >= 0 and line.find(sComposerVersion) >= 0:
           v_print(" - set " + sComposerVersion + " to " + sModuleVersion + " in " + sSource + " at Line " + str(line_count))
           line ="  " + sComposerVersion + ': "' + sModuleVersion + '",\n'
 
         # install.sql custom keys
-        if sSource.find(sInstallSql) > 0 and line.find(sSkeletonSkeletonForm) > 0:
+        if sSource.find(sInstallSql) >= 0 and line.find(sSkeletonSkeletonForm) >= 0:
           v_print(" - renaming " + sSource + " at Line: " + str(line_count))
           line = line.replace(sSkeletonSkeletonForm, oModule.getFormName(False)+"-single")
-        if sSource.find(sInstallSql) > 0 and line.find(sSkeletonForm) > 0:
+        if sSource.find(sInstallSql) >= 0 and line.find(sSkeletonForm) >= 0:
           v_print(" - renaming " + sSource + " at Line: " + str(line_count))
           line = line.replace(sSkeletonForm, oModule.getBaseName(False)+"-single")
-        if sSource.find(sInstallSql) > 0 and line.find(sSkeletonIdfs) > 0:
+        if sSource.find(sInstallSql) >= 0 and line.find(sSkeletonIdfs) >= 0:
           v_print(" - renaming " + sSource + " at Line: " + str(line_count))
           line = line.replace(sSkeletonIdfs, oModule.getBaseName(False)+"_idfs")
-        if sSource.find(sInstallSql) > 0 and line.find(sSkeletonFormLabel) > 0:
+        if sSource.find(sInstallSql) >= 0 and line.find(sSkeletonFormLabel) >= 0:
           v_print(" - renaming " + sSource + " at Line: " + str(line_count))
           line = line.replace(sSkeletonFormLabel, oModule.getLabel(True))
 
@@ -398,6 +662,35 @@ for root, dirs, files in os.walk(sModulePath):
     os.remove(sSource)
     fpW.close()
     os.rename(sSourceTemp, sSource)
+
+
+if sModuleToUpgrade:
+  # copy skeleton file tree
+  print("Copy Controller form Source Module " + sModulePath + "\n")
+  try:
+    for file in glob.glob(sModuleToUpgrade + "/src/Controller/*.php"):
+      #f = open(sModulePath + "/src/Controller/"+ os.path.basename(file))
+      if not os.path.exists(sModulePath + "/src/Controller/"+os.path.basename(file)):
+        v_print("Copy " + file + " to " + sModulePath + "/src/Controller/"+ os.path.basename(file))
+        shutil.copyfile(file,sModulePath + "/src/Controller/"+os.path.basename(file))
+
+  except IOError:
+    print("IOError: " + file)
+
+
+  try:
+    view = "/view/one-place/" + oModule.getBaseName(False) + "/" + oModule.getModelName(False) + "/" + oModule.getModelName(False)
+    if os.path.exists(sModuleToUpgrade+view):
+      shutil.rmtree(sModulePath+view, ignore_errors=False, onerror=remove_readonly)
+      shutil.copytree(sModuleToUpgrade+view, sModulePath+view)
+
+    shutil.copytree(sModuleToUpgrade+"/.git/", sModulePath+"/.git/")
+    shutil.rmtree(sModulePath+"/data/", ignore_errors=False, onerror=remove_readonly)
+    shutil.copytree(sModuleToUpgrade+"/data/", sModulePath+"/data/")
+    shutil.copytree(sModuleToUpgrade+"/docs/", sModulePath+"/docs/")
+
+  except IOError as err:
+    v_print("Cant copy: "+  format(err))
 
 print("Total: " + str(iChangeCount) + " changes inside files")
 iChangeCount=0

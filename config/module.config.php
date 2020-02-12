@@ -37,6 +37,16 @@ return [
                     ],
                 ],
             ],
+            'skeleton-skeleton-setup' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/skeleton/skeleton/setup',
+                    'defaults' => [
+                        'controller' => Controller\InstallController::class,
+                        'action'     => 'checkdb',
+                    ],
+                ],
+            ],
         ],
     ], # Routes
 

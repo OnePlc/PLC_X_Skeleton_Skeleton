@@ -2,7 +2,7 @@
 /**
  * Module.php - Module Class
  *
- * Module Class File for Skeleton Skeleton Plugin
+ * Module Class File for Skeleton-Skeleton Plugin
  *
  * @category Config
  * @package Skeleton\Skeleton
@@ -31,7 +31,7 @@ class Module {
      *
      * @since 1.0.0
      */
-    const VERSION = '1.0.0';
+    const VERSION = '1.0.1';
 
     /**
      * Load module config file
@@ -91,6 +91,15 @@ class Module {
                     return new Controller\SkeletonController(
                         $oDbAdapter,
                         $tableGateway,
+                        $container
+                    );
+                },
+                # Installer
+                Controller\InstallController::class => function($container) {
+                    $oDbAdapter = $container->get(AdapterInterface::class);
+                    return new Controller\InstallController(
+                        $oDbAdapter,
+                        $container->get(Model\AddressTable::class),
                         $container
                     );
                 },
