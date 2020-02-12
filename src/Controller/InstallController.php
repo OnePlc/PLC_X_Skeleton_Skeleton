@@ -94,11 +94,11 @@ class InstallController extends CoreUpdateController {
 
             $oModTbl = new TableGateway('core_module', CoreUpdateController::$oDbAdapter);
             $oModTbl->insert([
-                'module_key'=>'oneplace-skeleton-skeleton',
-                'type'=>'plugin',
-                'version'=>\OnePlace\Skeleton\Module::VERSION,
-                'label'=>'onePlace Skeleton1 Skeleton',
-                'vendor'=>'oneplace',
+                'module_key' => 'oneplace-skeleton-skeleton',
+                'type' => 'plugin',
+                'version' => \OnePlace\Skeleton\Skeleton\Module::VERSION,
+                'label' => 'onePlace Skeleton1 Skeleton',
+                'vendor' => 'oneplace',
             ]);
 
             try {

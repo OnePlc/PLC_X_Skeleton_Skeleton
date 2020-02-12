@@ -18,7 +18,7 @@ createmodulefromskeleton.py - Create your own submodule form a oneplace Skeleton
  @author Verein onePlace
  @copyright (C) 2020  Verein onePlace <admin@1plc.ch>
  @license https://opensource.org/licenses/BSD-3-Clause
- @version 1.0.1
+ @version 1.0.2
  @since 1.0.0
 """
 
@@ -288,7 +288,7 @@ oSkeleton.set(oModule)
 '''
 if sModuleToUpgrade:
 
-  parseModulePhp("../src/Module.php",aSkeletonControllerNames,aSkeletonControllers)
+  parseModulePhp("../src/Module.php.no_controller",aSkeletonControllerNames,aSkeletonControllers)
   parseModulePhp(sModuleToUpgrade + "/src/Module.php",aModuleControllerNames,aModuleControllers,True,True)
 
   # remove known Controllers from List
@@ -297,11 +297,6 @@ if sModuleToUpgrade:
       index=aSkeletonControllerNames.index(name)
       aSkeletonControllerNames.pop(index)
       aSkeletonControllers.pop(index)
-  for name in aModuleControllerNames:
-    if name.find(oModule.getModelName(True)) >=0:
-      index=aModuleControllerNames.index(name)
-      aModuleControllerNames.pop(index)
-      aModuleControllers.pop(index)
 
   for sSCtl in aSkeletonControllerNames:
     for sMCtl in aModuleControllerNames:
@@ -315,7 +310,10 @@ if sModuleToUpgrade:
         aSkeletonControllers.pop(index)
 
   # aModuleControllers -> Controllers to add after rebase
-  print(str(len(aModuleControllers)) +" new Controllers to add\n")
+  print(str(len(aModuleControllers)) +" new Controllers to add")
+  for name in aModuleControllerNames:
+    print (name)
+
 
 
   parseModuleConfig("../config/module.config.php.no_route",aSkeletonRouteNames,aSkeletonRoutes)
@@ -546,9 +544,11 @@ for root, dirs, files in os.walk(sModulePath):
     sCodeRoutesStart = "Routes"
     sCodeInsertHooks = "Plugin Hook"
     sRouteStart = "'routes'"
-    sFactoriesStart = "'routes'"
+    sFactoriesStart = "'factories'"
     sCodeUse = "use "
     bCodeDelMode = False
+    bGetControllerConfig=False
+
 
     try:
       for line in fp:
@@ -562,12 +562,15 @@ for root, dirs, files in os.walk(sModulePath):
               fpW.write(route)
             line=""
 
+          if sSource.find(sModulePhp) >= 0 and line.find("getControllerConfig") >= 0:
+            bGetControllerConfig=True
           # Module.php insert controllers
-          if sSource.find(sModuleConfig) >= 0 and line.find(sFactoriesStart) >= 0:
-            fpW.write(line)
-            for ctrl in aModuleControllers:
-              fpW.write(ctrl)
-            line=""
+          if bGetControllerConfig:
+            if sSource.find(sModulePhp) >= 0 and line.find(sFactoriesStart) >= 0:
+              fpW.write(line)
+              for ctrl in aModuleControllers:
+                fpW.write(ctrl)
+              line=""
 
 
           # insert Custom Hooks
@@ -575,6 +578,7 @@ for root, dirs, files in os.walk(sModulePath):
             fpW.write(line)
             for hook in aHooks:
               fpW.write(hook)
+            line=""
 
           # replace aIncludes with original
           if sSource.find(sModulePhp) >= 0 and line.find(sCodeUse) >= 0:
