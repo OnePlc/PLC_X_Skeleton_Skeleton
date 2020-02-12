@@ -483,12 +483,14 @@ if sModuleToUpgrade:
   try:
     shutil.rmtree(sModulePath+"/view/partial", ignore_errors=False, onerror=remove_readonly)
     shutil.copytree(sModuleToUpgrade+"/view/partial", sModulePath+"/view/partial")
-
-    shutil.copyfile(sModuleToUpgrade+"/"+sComposerJson,sModulePath+"/"+sComposerJson)
-    shutil.copyfile(sModuleToUpgrade+"/README.md",sModulePath+"/")
-
   except IOError as err:
-    v_print("Cant create module "+ "\n" + format(err))
+    v_print("Cant copy; "+ format(err))
+
+  try:
+    shutil.copyfile(sModuleToUpgrade+"/"+sComposerJson,sModulePath+"/"+sComposerJson)
+    shutil.copyfile(sModuleToUpgrade+"/README.md",sModulePath+"/README.md")
+  except IOError as err:
+    print("Cant copy; "+ format(err))
 
 if args.route:
   os.remove(sModulePath+"/config/module.config.php.no_route")
