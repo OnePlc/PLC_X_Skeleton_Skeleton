@@ -99,7 +99,7 @@ class Module {
                     $oDbAdapter = $container->get(AdapterInterface::class);
                     return new Controller\InstallController(
                         $oDbAdapter,
-                        $container->get(Model\AddressTable::class),
+                        $container->get(Model\SkeletonTable::class),
                         $container
                     );
                 },
