@@ -2,7 +2,7 @@
 /**
  * module.config.php - Skeleton Config
  *
- * Main Config File for Skeleton Skeleton Plugin
+ * Main Config File for Skeleton1 Skeleton Plugin
  *
  * @category Config
  * @package Skeleton\Skeleton

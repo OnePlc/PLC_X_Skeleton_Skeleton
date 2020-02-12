@@ -324,11 +324,6 @@ if sModuleToUpgrade:
       index=aSkeletonRouteNames.index(name)
       aSkeletonRouteNames.pop(index)
       aSkeletonRoutes.pop(index)
-  for name in aModuleRouteNames:
-    if name.find(oModule.getName(False)) >=0:
-      index=aModuleRouteNames.index(name)
-      aModuleRouteNames.pop(index)
-      aModuleRoutes.pop(index)
 
   for sSCtl in aSkeletonRouteNames:
     for sMCtl in aModuleRouteNames:
@@ -360,6 +355,8 @@ if sModuleToUpgrade:
   #manage Controller.php
   args.controller=False
   args.route=False
+
+  aWhiteList.append("/data/")
 
 
 
@@ -685,16 +682,26 @@ if sModuleToUpgrade:
   try:
     view = "/view/one-place/" + oModule.getBaseName(False) + "/" + oModule.getModelName(False) + "/" + oModule.getModelName(False)
     if os.path.exists(sModuleToUpgrade+view):
-      shutil.rmtree(sModulePath+view, ignore_errors=False, onerror=remove_readonly)
-      shutil.copytree(sModuleToUpgrade+view, sModulePath+view)
-
-    shutil.copytree(sModuleToUpgrade+"/.git/", sModulePath+"/.git/")
-    shutil.rmtree(sModulePath+"/data/", ignore_errors=False, onerror=remove_readonly)
-    shutil.copytree(sModuleToUpgrade+"/data/", sModulePath+"/data/")
-    shutil.copytree(sModuleToUpgrade+"/docs/", sModulePath+"/docs/")
-
+      v_print("form " + sModuleToUpgrade+view + " to " +  sModulePath + view )
+      shutil.copytree(sModuleToUpgrade+view, sModulePath + view )
   except IOError as err:
-    v_print("Cant copy: "+  format(err))
+    v_print("Cant copy views: "+  format(err))
+
+  try:
+    shutil.copytree(sModuleToUpgrade+"/.git", sModulePath+"/.git")
+  except IOError as err:
+    v_print("Cant copy git: "+  format(err))
+
+  try:
+    shutil.rmtree(sModulePath+"/data/", ignore_errors=False, onerror=remove_readonly)
+    shutil.copytree(sModuleToUpgrade+"/data/", sModulePath+"/data")
+  except IOError as err:
+    v_print("Cant copy data : "+  format(err))
+
+  try:
+    shutil.copytree(sModuleToUpgrade+"/docs/", sModulePath+"/docs")
+  except IOError as err:
+    v_print("Cant copy docs: "+  format(err))
 
 print("Total: " + str(iChangeCount) + " changes inside files")
 iChangeCount=0
