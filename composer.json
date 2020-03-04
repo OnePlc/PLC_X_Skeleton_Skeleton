@@ -1,5 +1,5 @@
 {
-  "name": "oneplace/oneplace-skeleton-skeleton",
+  "name": "$vendor$/oneplace-skeleton-skeleton",
   "description": "onePlace Skeleton-Skeleton Plugin. Manage your Skeleton's",
   "type": "oneplace-plugin",
   "version": "1.0.1",
@@ -18,7 +18,7 @@
     "php-coveralls/php-coveralls": "^2.2"
   },
   "require": {
-    "php": "^7.1",
+    "php": "^7.1"
   },
   "autoload": {
     "psr-4": {

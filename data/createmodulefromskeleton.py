@@ -21,10 +21,15 @@ createmodulefromskeleton.py - Create your own submodule form a oneplace Skeleton
  @version 1.0.2
  @since 1.0.0
 """
+"""
+"""
 
 class Skeleton:
   def __init__(self,name):
     self.name = name.split('-')
+  def setVendor(self,vendor_upper,vendor_lower):
+    self.vendorU = vendor_upper
+    self.vendorL = vendor_lower
   def set(self,module):
     self.module = module
   def getName(self,upper):
@@ -45,8 +50,16 @@ class Skeleton:
     return ''.join(getupperlower(self.name[0],upper))
   def getLabel(self,upper):
     return ' '.join(getupperlower(self.name,upper))
+  def getVendor(self,upper):
+    if upper:
+      #print(self.vendor)
+      return self.vendorU[:-1]
+    else:
+      return self.vendorL
   def get(self):
     return [
+    [self.getVendor(True),self.module.getVendor(True)],
+    [self.getVendor(False),self.module.getVendor(False)],
     [self.getName(True),self.module.getName(True)],
     [self.getName(False),self.module.getName(False)],
     [self.getTableName(True),self.module.getTableName(True)],
@@ -68,6 +81,8 @@ class Skeleton:
     ]
   def getview(self):
     return [
+      [self.getVendor(True),self.module.getVendor(True)],
+      [self.getVendor(False),self.module.getVendor(False)],
       [self.getModelName(True)+"2",self.module.getModelName(True)],
       [self.getModelName(False)+"2",self.module.getModelName(False)],
       [self.getBaseName(True),self.module.getBaseName(True)],
@@ -94,6 +109,7 @@ aWhiteList.append("/language/")
 
 
 #default Values
+sDefaultVendor = "OnePlace"
 sSkeletonName = "Skeleton-Skeleton"
 sSkeletonVersion = "1.0.0"
 sModulePhp = "Module.php"
@@ -167,6 +183,7 @@ oArgParser.add_argument("submodule", help='your submodule: skeleton-skeleton',de
 oArgParser.add_argument("--version", help='X.X.X - version of submodule',default=sSkeletonVersion,type=regex_version_validate)
 oArgParser.add_argument("--parent", help=sSkeletonName+' - skeleton name',default=sSkeletonName,type=regex_skeleton_module)
 oArgParser.add_argument("--upgrade", help='path to project')
+oArgParser.add_argument("--vendor", help='set custom vendor')
 
 oArgParser.add_argument("-v", "--verbose", help='increase output verbosity',action="store_true")
 oArgParser.add_argument("-m", "--model", help='add model structure',action="store_true")
@@ -280,7 +297,19 @@ def parseModuleConfig(path,names,route):
 # init class for handling renaming variants
 oSkeleton = Skeleton(sSkeletonName)
 oModule = Skeleton(sModuleName)
+oSkeleton.setVendor(sDefaultVendor + "\\","$vendor$")
+if args.vendor:
+  print(args.vendor)
+  oModule.setVendor(args.vendor + "\\",args.vendor.lower())
+else:
+  print(sDefaultVendor)
+  oModule.setVendor(sDefaultVendor + "\\",sDefaultVendor.lower())
+
 oSkeleton.set(oModule)
+
+print(oSkeleton.get())
+print(sDefaultVendor)
+exit(0)
 
 
 '''
@@ -651,9 +680,12 @@ for root, dirs, files in os.walk(sModulePath):
 
         # replace skeleton name
         sOrig=line
+
         for result in oSkeleton.get():
+          #print(result)
           line = line.replace(result[0], result[1])
         if sOrig != line :
+          #print(sOrig + " ! " + line)
           v_print(" - renaming " + sSource + " at Line: " + str(line_count))
           iChangeCount += 1
         fpW.write(line)

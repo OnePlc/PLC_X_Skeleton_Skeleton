@@ -67,25 +67,25 @@ class InstallController extends CoreUpdateController {
 
             return new ViewModel([
                 'bTableExists' => $bTableExists,
-                'sVendor' => 'oneplace',
+                'sVendor' => '$vendor$',
                 'sModule' => 'oneplace-skeleton-skeleton',
             ]);
         } else {
             $sSetupConfig = $oRequest->getPost('plc_module_setup_config');
 
-            $sSetupFile = 'vendor/oneplace/oneplace-skeleton-skeleton/data/install.sql';
+            $sSetupFile = 'vendor/$vendor$/oneplace-skeleton-skeleton/data/install.sql';
             if(file_exists($sSetupFile)) {
                 echo 'got install file..';
                 $this->parseSQLInstallFile($sSetupFile,CoreUpdateController::$oDbAdapter);
             }
 
             if($sSetupConfig != '') {
-                $sConfigStruct = 'vendor/oneplace/oneplace-skeleton-skeleton/data/structure_'.$sSetupConfig.'.sql';
+                $sConfigStruct = 'vendor/$vendor$/oneplace-skeleton-skeleton/data/structure_'.$sSetupConfig.'.sql';
                 if(file_exists($sConfigStruct)) {
                     echo 'got struct file for config '.$sSetupConfig;
                     $this->parseSQLInstallFile($sConfigStruct,CoreUpdateController::$oDbAdapter);
                 }
-                $sConfigData = 'vendor/oneplace/oneplace-skeleton-skeleton/data/data_'.$sSetupConfig.'.sql';
+                $sConfigData = 'vendor/$vendor$/oneplace-skeleton-skeleton/data/data_'.$sSetupConfig.'.sql';
                 if(file_exists($sConfigData)) {
                     echo 'got data file for config '.$sSetupConfig;
                     $this->parseSQLInstallFile($sConfigData,CoreUpdateController::$oDbAdapter);
@@ -98,7 +98,7 @@ class InstallController extends CoreUpdateController {
                 'type' => 'plugin',
                 'version' => \OnePlace\Skeleton\Skeleton\Module::VERSION,
                 'label' => 'onePlace Skeleton1 Skeleton',
-                'vendor' => 'oneplace',
+                'vendor' => '$vendor$',
             ]);
 
             try {

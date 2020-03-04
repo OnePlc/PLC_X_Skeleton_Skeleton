@@ -38,9 +38,13 @@ return [
                 ],
             ],
             'skeleton-skeleton-setup' => [
-                'type'    => Literal::class,
+                'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/skeleton/skeleton/setup',
+                    'route' => '/skeleton/skeleton/setup[/:action[/:id]]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id'     => '[0-9]+',
+                    ],
                     'defaults' => [
                         'controller' => Controller\InstallController::class,
                         'action'     => 'checkdb',
