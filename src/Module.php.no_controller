@@ -2,7 +2,7 @@
 /**
  * Module.php - Module Class
  *
- * Module Class File for Skeleton Skeleton Plugin
+ * Module Class File for Skeleton1 Skeleton Plugin
  *
  * @category Config
  * @package Skeleton\Skeleton
@@ -86,7 +86,7 @@ class Module {
                     $oDbAdapter = $container->get(AdapterInterface::class);
                     return new Controller\InstallController(
                         $oDbAdapter,
-                        $container->get(Model\AddressTable::class),
+                        $container->get(Model\SkeletonTable::class),
                         $container
                     );
                 },
